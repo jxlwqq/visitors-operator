@@ -43,3 +43,19 @@ operator-sdk create api \
 --version=v1alpha1 \
 --kind=VisitorsApp
 ```
+
+定义 VisitorsApp 自定义资源（CR）的 API。
+
+修改 api/v1alpha1/visitorsapp_types.go 中的 Go 类型定义，使其具有以下 spec 和 status
+
+```go
+type VisitorsAppSpec struct {
+	Size int32 `json:"size"`
+	Title string `json:"title"`
+}
+
+type VisitorsAppStatus struct {
+	BackendImage string `json:"backend_image"`
+	FrontendImage string `json:"frontend_image"`
+}
+```
