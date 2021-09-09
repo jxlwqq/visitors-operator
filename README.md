@@ -59,3 +59,9 @@ type VisitorsAppStatus struct {
 	FrontendImage string `json:"frontend_image"`
 }
 ```
+
+为资源类型更新生成的代码：
+```shell
+make generate
+```
+
