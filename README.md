@@ -289,3 +289,49 @@ operator-sdk olm install
 operator-sdk run bundle docker.io/jxlwqq/visitors-operator-bundle:v0.0.1
 ```
 
+
+### 创建自定义资源
+
+编辑 config/samples/app_v1alpha1_visitorsapp.yaml 上的 VisitorsApp CR 清单示例，使其包含以下规格：
+
+```yaml
+apiVersion: app.jxlwqq.github.io/v1alpha1
+kind: VisitorsApp
+metadata:
+  name: visitorsapp-sample
+spec:
+  # Add fields here
+  size: 1
+  title: Hello
+```
+
+创建 CR：
+```shell
+kubectl apply -f config/samples/app_v1alpha1_visitorsapp.yaml
+```
+
+查看 Pod：
+```shell
+NAME                                           READY   STATUS    RESTARTS   AGE
+mysql-bbdc8b45f-mxt4l                          1/1     Running   0          11s
+visitorsapp-sample-backend-5f954fcc56-mm8bp    1/1     Running   0          11s
+visitorsapp-sample-frontend-6b666b55c7-hl4ch   1/1     Running   0          11s
+```
+
+查看 Service：
+```shell
+NAME                              TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+kubernetes                        ClusterIP   10.96.0.1        <none>        443/TCP          18h
+mysql-svc                         ClusterIP   None             <none>        3306/TCP         52s
+visitorsapp-sample-backend-svc    NodePort    10.105.131.165   <none>        8000:30685/TCP   52s
+visitorsapp-sample-frontend-svc   NodePort    10.99.93.124     <none>        3000:30686/TCP   52s
+```
+
+浏览器访问：http://localhost:30686
+
+网页上会显示一下内容：
+```text
+Service IP	Client IP	Timestamp
+10.1.1.108	192.168.65.3	2021/9/10 上午11:06:40
+10.1.1.108	192.168.65.3	2021/9/10 上午11:06:38
+```
