@@ -33,7 +33,7 @@ operator-sdk init \
 
 使用 Operator SDK CLI 创建自定义资源定义（CRD）API 和控制器。
 
-运行以下命令创建带有组 cache、版本 v1alpha1 和种类 Memcached 的 API：
+运行以下命令创建带有组 cache、版本 v1alpha1 和种类 VisitorsApp 的 API：
 
 ```shell
 operator-sdk create api \
@@ -260,5 +260,20 @@ make docker-push
 成功后访问：https://hub.docker.com/r/jxlwqq/visitors-operator
 
 
+运行 make bundle 命令创建 Operator 捆绑包清单，并依次填入名称、作者等必要信息:
+```shell
+make bundle
+```
 
+构建捆绑包镜像：
+```shell
+make bundle-build
+```
+
+推送捆绑包镜像：
+```shell
+make bundle-push
+```
+
+成功后访问：https://hub.docker.com/r/jxlwqq/visitors-operator-bundle
 
