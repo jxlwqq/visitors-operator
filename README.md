@@ -1,5 +1,8 @@
 # visitors-operator
 
+> visitors-operator 是书籍《Kubernetes Operators》的经典示例，此书著于2019年，Operator-SDK 版本迭代较快，随书的代码仓库
+> https://github.com/kubernetes-operators-book/chapters 已基本不可用。所以本示例基于最新版本的 Operator-SDK，做了大量的修改和调整。
+
 ### 前置条件
 
 * 安装 Docker Desktop，并启动内置的 Kubernetes 集群
@@ -340,6 +343,6 @@ Service IP	Client IP	Timestamp
 ### 做好清理
 
 ```shell
-operator-sdk cleanup memcached-operator
+operator-sdk cleanup visitors-operator
 operator-sdk olm uninstall
 ```
