@@ -18,11 +18,16 @@ package controllers
 
 import (
 	"context"
+	"fmt"
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
+	ctrllog "sigs.k8s.io/controller-runtime/pkg/log"
 
 	appv1alpha1 "github.com/jxlwqq/visitors-operator/api/v1alpha1"
 )
@@ -36,6 +41,10 @@ type VisitorsAppReconciler struct {
 //+kubebuilder:rbac:groups=app.jxlwqq.github.io,resources=visitorsapps,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=app.jxlwqq.github.io,resources=visitorsapps/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=app.jxlwqq.github.io,resources=visitorsapps/finalizers,verbs=update
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=pods,verbs=get;list;watch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -47,9 +56,85 @@ type VisitorsAppReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.9.2/pkg/reconcile
 func (r *VisitorsAppReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := ctrllog.FromContext(ctx)
+	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
+	reqLogger.Info("Reconciling VisitorsApp")
 
-	// your logic here
+	// Fetch the VisitorsApp instance
+	v := &appv1alpha1.VisitorsApp{}
+	err := r.Client.Get(context.TODO(), req.NamespacedName, v)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
+		return ctrl.Result{}, err
+	}
+
+	var result *ctrl.Result
+
+	// Database
+	result, err = r.ensureSecret(r.mysqlAuthSecret(v))
+	if result != nil {
+		return *result, err
+	}
+
+	result, err = r.ensureDeployment(r.mysqlDeployment(v))
+	if result != nil {
+		return *result, err
+	}
+
+	result, err = r.ensureService(r.mysqlService(v))
+	if result != nil {
+		return *result, err
+	}
+
+	if !r.isMysqlUp(v) {
+		delay := time.Second * time.Duration(5)
+		log.Info(fmt.Sprintf("MySQL isn't running, waiting for %s", delay))
+		return ctrl.Result{RequeueAfter: delay}, nil
+	}
+
+	// Backend
+	result, err = r.ensureDeployment(r.backendDeployment(v))
+	if result != nil {
+		return *result, err
+	}
+
+	result, err = r.ensureService(r.backendService(v))
+	if result != nil {
+		return *result, err
+	}
+
+	err = r.updateBackendStatus(v)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	result, err = r.handleBackendChanges(v)
+	if result != nil {
+		return *result, err
+	}
+
+	// Frontend
+	result, err = r.ensureDeployment(r.frontendDeployment(v))
+	if result != nil {
+		return *result, err
+	}
+
+	result, err = r.ensureService(r.frontendService(v))
+	if result != nil {
+		return *result, err
+	}
+
+	err = r.updateFrontendStatus(v)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	result, err = r.handleFrontendChanges(v)
+	if result != nil {
+		return *result, err
+	}
 
 	return ctrl.Result{}, nil
 }
@@ -58,5 +143,8 @@ func (r *VisitorsAppReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 func (r *VisitorsAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&appv1alpha1.VisitorsApp{}).
+		Owns(&appsv1.Deployment{}).
+		Owns(&corev1.Service{}).
+		Owns(&corev1.Secret{}).
 		Complete(r)
 }
