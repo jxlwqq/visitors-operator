@@ -277,3 +277,15 @@ make bundle-push
 
 成功后访问：https://hub.docker.com/r/jxlwqq/visitors-operator-bundle
 
+
+使用 Operator Lifecycle Manager 部署 Operator:
+
+```shell
+# 切换至本地集群
+kubectl config use-context docker-desktop
+# 安装 olm
+operator-sdk olm install
+# 使用 Operator SDK 中的 OLM 集成在集群中运行 Operator
+operator-sdk run bundle docker.io/jxlwqq/visitors-operator-bundle:v0.0.1
+```
+
