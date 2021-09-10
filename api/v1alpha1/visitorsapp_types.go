@@ -27,7 +27,7 @@ import (
 type VisitorsAppSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Size int32 `json:"size"`
+	Size  int32  `json:"size"`
 	Title string `json:"title"`
 }
 
@@ -35,7 +35,7 @@ type VisitorsAppSpec struct {
 type VisitorsAppStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	BackendImage string `json:"backend_image"`
+	BackendImage  string `json:"backend_image"`
 	FrontendImage string `json:"frontend_image"`
 }
 

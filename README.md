@@ -235,6 +235,30 @@ func (r *VisitorsAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 make manifests
 ```
 
+#### 运行 Operator
+
+捆绑 Operator，并使用 Operator Lifecycle Manager（OLM）在集群中部署。
+
+修改 Makefile 中 IMAGE_TAG_BASE 和 IMG：
+
+```makefile
+IMAGE_TAG_BASE ?= docker.io/jxlwqq/visitors-operator
+IMG ?= $(IMAGE_TAG_BASE):latest
+```
+
+构建镜像：
+
+```shell
+make docker-build
+```
+
+将镜像推送到镜像仓库：
+```shell
+make docker-push
+```
+
+成功后访问：https://hub.docker.com/r/jxlwqq/visitors-operator
+
 
 
 
