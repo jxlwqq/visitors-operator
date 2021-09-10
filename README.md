@@ -332,8 +332,10 @@ visitorsapp-sample-frontend-svc   NodePort    10.99.93.124     <none>        300
 
 浏览器访问：http://localhost:30686
 
-网页上会显示一下内容：
+网页上会显示以下内容，记录了访问者的访问记录：
 ```text
+Hello
+
 Service IP	Client IP	Timestamp
 10.1.1.108	192.168.65.3	2021/9/10 上午11:06:40
 10.1.1.108	192.168.65.3	2021/9/10 上午11:06:38
