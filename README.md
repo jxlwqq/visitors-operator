@@ -70,7 +70,7 @@ make generate
 make manifests
 ```
 
-#### 实现控制器
+### 实现控制器
 
 > 由于逻辑较为复杂，代码较为庞大，所以无法在此全部展示，完整的操作器代码请参见 controllers 目录。
 
@@ -235,7 +235,7 @@ func (r *VisitorsAppReconciler) SetupWithManager(mgr ctrl.Manager) error {
 make manifests
 ```
 
-#### 运行 Operator
+### 运行 Operator
 
 捆绑 Operator，并使用 Operator Lifecycle Manager（OLM）在集群中部署。
 
@@ -334,4 +334,12 @@ visitorsapp-sample-frontend-svc   NodePort    10.99.93.124     <none>        300
 Service IP	Client IP	Timestamp
 10.1.1.108	192.168.65.3	2021/9/10 上午11:06:40
 10.1.1.108	192.168.65.3	2021/9/10 上午11:06:38
+```
+
+
+### 做好清理
+
+```shell
+operator-sdk cleanup memcached-operator
+operator-sdk olm uninstall
 ```
