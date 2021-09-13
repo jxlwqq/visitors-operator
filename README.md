@@ -348,3 +348,7 @@ Service IP	Client IP	Timestamp
 operator-sdk cleanup visitors-operator
 operator-sdk olm uninstall
 ```
+
+### 更多
+
+更多经典示例请参考：https://github.com/jxlwqq/kubernetes-examples
